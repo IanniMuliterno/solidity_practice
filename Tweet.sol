@@ -13,7 +13,10 @@ contract Twitter {
         uint256 likes;
      }
 
-           constructor() {
+    address public owner;
+    mapping (address => Tweet[]) public tweets;
+
+    constructor() {
         owner = msg.sender;
      };   
 
@@ -22,11 +25,11 @@ contract Twitter {
         _;
      }
 
-     function changeName(string newOwner) public onlyOwner {
-        owner = newOwner;
+     function changeTweetLen(uint16 newlen) public onlyOwner {
+        max_length = newlen;
      }
 
-    mapping (address => Tweet[]) public tweets;
+
 
     function creatTweet(string memory _tweet) public {
 
