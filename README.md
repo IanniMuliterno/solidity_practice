@@ -15,7 +15,7 @@ Welcome to my toy contracts repository, the intention here is to build some toy 
 
 * Event practice
 
-   A contract that allows user registration and notifies everytime a new user is added.
+   A contract that allows user registration and notifies everytime a new user is added. Solidifying `event`skills.
 
  ## Source
  [solidity documentation](https://docs.soliditylang.org/en/v0.8.25/)
