@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
-// add id to tweet struct to make every tweet unique ( in the createtweet function) ok 
-// add a function to like the tweet ( two parameters, id and author)
-// add a function to unlike the tweet ( like must be greater than 0)
-// mark both functions external
 
 pragma solidity 0.8.24;
 
 contract Twitter {
 
-    uint16 public  max_length = 10;
+    uint16 public  max_length = 100;
 
+    event newtweet_event(uint256 id, address author, string tweet);
+    event likedtweet_event(address author, address liker, uint256 id, uint256 likes);
+    event unlikedtweet_event(address author, address unliker, uint256 id, uint256 likes);
 
     struct Tweet {
         uint256 id; 
@@ -49,6 +48,8 @@ contract Twitter {
         });
 
         tweets[msg.sender].push(newTweet);
+        emit newtweet_event(newTweet.id,newTweet.author, newTweet.content);
+    
     }
 
     
@@ -63,12 +64,16 @@ contract Twitter {
     function like_t(address t_author, uint256 id) external  {
     require(tweets[t_author][id].id == id, "this tweet does not exists");
     tweets[t_author][id].likes++;
+
+    emit likedtweet_event(t_author, msg.sender,id, tweets[t_author][id].likes);
     }
 
     function unlike_t(address t_author, uint256 id) external  {
     require(tweets[t_author][id].id == id, "this tweet does not exists");    
     require(tweets[t_author][id].likes > 0, "this tweet does not have likes");
     tweets[t_author][id].likes--;
+
+    emit unlikedtweet_event(t_author, msg.sender,id, tweets[t_author][id].likes);
     }
 
 }
