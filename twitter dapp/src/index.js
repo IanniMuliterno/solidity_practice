@@ -12,7 +12,14 @@ async function connectWallet() {
   if (window.ethereum) {
     // 1️⃣ Request Wallet Connection from Metamask
     // ANSWER can be found here: https://docs.metamask.io/wallet/get-started/set-up-dev-environment/
-    // const accounts = YOUR CODE
+     const accounts = await providerWithInfo.provider
+       .request({ method: "eth_requestAccounts" })
+       .catch(console.error);
+
+     if (accounts?.[0]) {
+       setSelectedWallet(providerWithInfo);
+       setUserAccount(accounts?.[0]);
+     }
 
     setConnected(accounts[0]);
   } else {
