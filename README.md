@@ -18,5 +18,6 @@ Welcome to my toy contracts repository, the intention here is to build some toy 
    A contract that allows user registration and notifies everytime a new user is added. Solidifying `event`skills.
 
  ## Source
- [solidity documentation](https://docs.soliditylang.org/en/v0.8.25/)
+ [solidity documentation](https://docs.soliditylang.org/en/v0.8.25/) 
+ 
  [Naz tutorial](https://www.youtube.com/watch?v=AYpftDFiIgk)
