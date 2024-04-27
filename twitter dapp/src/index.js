@@ -1,31 +1,25 @@
 import contractABI from "./abi.json";
 
-// 2️⃣ Set your smart contract address 👇
-const contractAddress = "0xf85fFeC37841aF5e6A6AddBA9202e7dc1ED62d1E";
+const contractAddress = "0xe270F382e3AA0B07f6a962014700AC2Cb64c91e9";
 
 let web3 = new Web3(window.ethereum);
-// 3️⃣ connect to the contract using web3
-// HINT: https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#new-contract
 let contract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function connectWallet() {
   if (window.ethereum) {
-    // 1️⃣ Request Wallet Connection from Metamask
-    // ANSWER can be found here: https://docs.metamask.io/wallet/get-started/set-up-dev-environment/
     const accounts = await window.ethereum
       .request({ method: "eth_requestAccounts" })
       .catch((err) => {
         if (err.code === 4001) {
-          // EIP-1193 userRejectedRequest error.
-          // If this happens, the user rejected the connection request.
           console.log("Please connect to MetaMask.");
         } else {
           console.error(err);
         }
       });
-    const account = accounts[0];
-    showAccount.innerHTML = account;
     setConnected(accounts[0]);
+    if (accounts[0]) {
+      console.log("We have an account");
+    }
   } else {
     console.error("No web3 provider detected");
     document.getElementById("connectMessage").innerText =
@@ -36,7 +30,7 @@ async function connectWallet() {
 async function createTweet(content) {
   const accounts = await web3.eth.getAccounts();
   try {
-    await contract.methods.createTweet(content).send({ from: accounts[0]});
+    await contract.methods.createTweet(content).send({ from: accounts[0] });
     displayTweets(accounts[0]);
   } catch (error) {
     console.error("User rejected request:", error);
@@ -45,12 +39,8 @@ async function createTweet(content) {
 
 async function displayTweets(userAddress) {
   const tweetsContainer = document.getElementById("tweetsContainer");
-  const tempTweets = [];
   tweetsContainer.innerHTML = "";
-  // 5️⃣ call the function getAllTweets from smart contract to get all the tweets
-  // HINT: https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#methods-mymethod-call
-  tempTweets = await contract.methods.getalltweets();
-
+  const tempTweets = await contract.methods.getAllTweets(userAddress).call();
   // we do this so we can sort the tweets  by timestamp
   const tweets = [...tempTweets];
   tweets.sort((a, b) => b.timestamp - a.timestamp);
@@ -82,7 +72,12 @@ async function displayTweets(userAddress) {
     likeButton.setAttribute("data-id", tweets[i].id);
     likeButton.setAttribute("data-author", tweets[i].author);
 
-    addLikeButtonListener(likeButton, userAddress, tweets[i].id, tweets[i].author);
+    addLikeButtonListener(
+      likeButton,
+      userAddress,
+      tweets[i].id,
+      tweets[i].author
+    );
     tweetInner.appendChild(likeButton);
     tweetElement.appendChild(tweetInner);
 
@@ -111,28 +106,24 @@ function shortAddress(address, startLength = 6, endLength = 4) {
 
 async function likeTweet(author, id) {
   try {
-    // 8️⃣ call the likeTweet function from smart contract
-    // INPUT: author and id
-    // GOAL: Save the like in the smart contract
-    // HINT: don't forget to use await 😉 👇
-    contract.like_t(author, id);
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.likeTweet(author, id).send({ from: accounts[0] });
   } catch (error) {
     console.error("User rejected request:", error);
   }
 }
 
 function setConnected(address) {
-  document.getElementById("userAddress").innerText = "Connected: " + shortAddress(address);
+  document.getElementById("userAddress").innerText =
+    "Connected: " + shortAddress(address);
   document.getElementById("connectMessage").style.display = "none";
   document.getElementById("tweetForm").style.display = "block";
-
-  // 6️⃣ Call the displayTweets function with address as input
-  // This is the function in the javascript code, not smart contract 😉
-  // GOAL: display all tweets after connecting to metamask
   displayTweets(address);
 }
 
-document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+document
+  .getElementById("connectWalletBtn")
+  .addEventListener("click", connectWallet);
 
 document.getElementById("tweetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
